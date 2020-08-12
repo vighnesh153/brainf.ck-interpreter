@@ -30,7 +30,7 @@ export default class Interpreter {
       }
       this.instructionPointer++;
     }
-    console.log(this.memory.outputBuffer.join(""));
+    return this.memory.outputBuffer.join("");
   }
 
   reachedEOF() {
