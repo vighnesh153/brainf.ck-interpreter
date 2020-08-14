@@ -5,28 +5,44 @@ export default class Interpreter {
     this.memory = new Memory();
     this.instructionPointer = 0;
     this.inputPointer = 0;
-	  this.openingToClosingBrackets = new Map();
-	  this.closingToOpeningBrackets = new Map();
+    this.openingToClosingBrackets = new Map();
+    this.closingToOpeningBrackets = new Map();
   }
 
   interpret(code, input = "") {
     this.reset();
     this.code = code;
     this.matchSquareBrackets();
-    this.input = input;
+    this.input = input + "\0";
 
     while (!this.reachedEOF()) {
       const instruction = this.code[this.instructionPointer];
 
       switch (instruction) {
-        case "+": this.memory.increment(); break;
-        case "-": this.memory.decrement(); break;
-        case ">": this.memory.moveRight(); break;
-        case "<": this.memory.moveLeft(); break;
-        case ".": this.memory.print(); break;
-        case ",": this.memory.input(this.getNextCharacter()); break;
-        case "[": this.loopStart(); break;
-        case "]": this.loopEnd(); break;
+        case "+":
+          this.memory.increment();
+          break;
+        case "-":
+          this.memory.decrement();
+          break;
+        case ">":
+          this.memory.moveRight();
+          break;
+        case "<":
+          this.memory.moveLeft();
+          break;
+        case ".":
+          this.memory.print();
+          break;
+        case ",":
+          this.memory.input(this.getNextCharacter());
+          break;
+        case "[":
+          this.loopStart();
+          break;
+        case "]":
+          this.loopEnd();
+          break;
       }
       this.instructionPointer++;
     }
@@ -41,7 +57,7 @@ export default class Interpreter {
     if (this.inputPointer >= this.input.length) {
       throw new Error("EOF. Expected more input characters.");
     }
-    return this.input[this.inputPointer];
+    return this.input[this.inputPointer++];
   }
 
   loopStart() {
@@ -54,12 +70,12 @@ export default class Interpreter {
   }
 
   loopEnd() {
-  	if (this.memory.current.value === 0) {
-  		return;
-	  }
-	  this.instructionPointer = this.closingToOpeningBrackets.get(
-		  this.instructionPointer
-	  );
+    if (this.memory.current.value === 0) {
+      return;
+    }
+    this.instructionPointer = this.closingToOpeningBrackets.get(
+      this.instructionPointer
+    );
   }
 
   matchSquareBrackets() {
